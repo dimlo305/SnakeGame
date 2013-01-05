@@ -25,7 +25,7 @@ public class Main implements Runnable {
     private long lastFrame;
     
     public void initUI() {
-        // Окно
+        // РћРєРЅРѕ
         this.frame = new JFrame("Madness Snake");
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
@@ -39,25 +39,25 @@ public class Main implements Runnable {
         //System.out.println(this.panel.getBounds().x);
         
         
-        // Отображаем
+        // РћС‚РѕР±СЂР°Р¶Р°РµРј
         this.frame.pack();
         this.frame.setVisible(true);
         
-        // Узнаём размеры границ окна
+        // РЈР·РЅР°С‘Рј СЂР°Р·РјРµСЂС‹ РіСЂР°РЅРёС† РѕРєРЅР°
         Insets insets = this.frame.getInsets();
         Point offset = new Point(insets.left, insets.top);
         
-        // Создаём два буффера, создаём объект матрицы "пикселей"
+        // РЎРѕР·РґР°С‘Рј РґРІР° Р±СѓС„С„РµСЂР°, СЃРѕР·РґР°С‘Рј РѕР±СЉРµРєС‚ РјР°С‚СЂРёС†С‹ "РїРёРєСЃРµР»РµР№"
         this.frame.createBufferStrategy(2);
         this.matrix = new DisplayMatrix(this.frame.getBufferStrategy(), offset);
         
-        // Регистрируем нажания клавиш в окне
+        // Р РµРіРёСЃС‚СЂРёСЂСѓРµРј РЅР°Р¶Р°РЅРёСЏ РєР»Р°РІРёС€ РІ РѕРєРЅРµ
         this.frame.setFocusable(true);
         this.frame.addKeyListener(new KeyListener() {
             public void keyTyped(KeyEvent arg0) {}
             public void keyReleased(KeyEvent arg0) {}
             
-            // Когда была нажата клавиша
+            // РљРѕРіРґР° Р±С‹Р»Р° РЅР°Р¶Р°С‚Р° РєР»Р°РІРёС€Р°
             public void keyPressed(KeyEvent event) {
                 Direction direction = null;
                 switch (event.getKeyCode()) {
@@ -76,53 +76,55 @@ public class Main implements Runnable {
     
     public void gameLoop() throws Exception {
         while (true) {
-            // Создаём объект игры
+            // РЎРѕР·РґР°С‘Рј РѕР±СЉРµРєС‚ РёРіСЂС‹
             this.game = new Game();
-            this.game.setDisplayMatrix(this.matrix); // Снабжаем его матрицей
+            this.game.setDisplayMatrix(this.matrix); // РЎРЅР°Р±Р¶Р°РµРј РµРіРѕ РјР°С‚СЂРёС†РµР№
+            // РћС‡РёС‰Р°РµРј РјР°С‚СЂРёС†Сѓ
+            this.matrix.reset();
             
             getDelta();
             
             this.matrix.startDraw();
-            // Инициализация игры
+            // РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РёРіСЂС‹
             this.game.init();
             this.matrix.endDraw();
             
             while (true) {
                 float deltaT = this.getDelta();
                 
-                // Говорим, что на матрицу можно рисовать
+                // Р“РѕРІРѕСЂРёРј, С‡С‚Рѕ РЅР° РјР°С‚СЂРёС†Сѓ РјРѕР¶РЅРѕ СЂРёСЃРѕРІР°С‚СЊ
                 this.matrix.startDraw();
                 
-                // Делаем один шаг игровой логики
+                // Р”РµР»Р°РµРј РѕРґРёРЅ С€Р°Рі РёРіСЂРѕРІРѕР№ Р»РѕРіРёРєРё
                 boolean go = this.game.step(deltaT);
                 if (!go) break;
                 
-                // Заканчиваем рисование на матрицу
+                // Р—Р°РєР°РЅС‡РёРІР°РµРј СЂРёСЃРѕРІР°РЅРёРµ РЅР° РјР°С‚СЂРёС†Сѓ
                 this.matrix.endDraw();
                 
-                // Вычисляем, сколько бы нам поспать, чтобы было около
-                // 30 кадров в секунду
+                // Р’С‹С‡РёСЃР»СЏРµРј, СЃРєРѕР»СЊРєРѕ Р±С‹ РЅР°Рј РїРѕСЃРїР°С‚СЊ, С‡С‚РѕР±С‹ Р±С‹Р»Рѕ РѕРєРѕР»Рѕ
+                // 30 РєР°РґСЂРѕРІ РІ СЃРµРєСѓРЅРґСѓ
                 long freeTime = 30 - (this.getTime() - this.lastFrame);
                 if (freeTime > 0) Thread.sleep(freeTime);
             }
             
-            // Игра окончена
+            // РРіСЂР° РѕРєРѕРЅС‡РµРЅР°
             // ...
-            // РЕСТАРТ!
+            // Р Р•РЎРўРђР Рў!
         }
     }
     
     public void run() {
-        // Инициализируем интерфейс
+        // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РёРЅС‚РµСЂС„РµР№СЃ
         this.initUI();
         
-        // Внезапно создаём ещё один поток,
-        // Ибо если будем что-то делать в этом, пока мы будем это делать,
-        // окно с игрой даже закрыть нельзя будет
+        // Р’РЅРµР·Р°РїРЅРѕ СЃРѕР·РґР°С‘Рј РµС‰С‘ РѕРґРёРЅ РїРѕС‚РѕРє,
+        // РР±Рѕ РµСЃР»Рё Р±СѓРґРµРј С‡С‚Рѕ-С‚Рѕ РґРµР»Р°С‚СЊ РІ СЌС‚РѕРј, РїРѕРєР° РјС‹ Р±СѓРґРµРј СЌС‚Рѕ РґРµР»Р°С‚СЊ,
+        // РѕРєРЅРѕ СЃ РёРіСЂРѕР№ РґР°Р¶Рµ Р·Р°РєСЂС‹С‚СЊ РЅРµР»СЊР·СЏ Р±СѓРґРµС‚
         (new Thread() {
             public void run() {
                 try {
-                    // Запускаем чёртов игровой цикл!
+                    // Р—Р°РїСѓСЃРєР°РµРј С‡С‘СЂС‚РѕРІ РёРіСЂРѕРІРѕР№ С†РёРєР»!
                     Main.this.gameLoop();
                 } catch (Exception e) {
                     e.printStackTrace();

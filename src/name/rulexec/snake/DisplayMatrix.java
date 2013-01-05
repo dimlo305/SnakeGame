@@ -17,8 +17,10 @@ public class DisplayMatrix implements IDisplayMatrix {
     public DisplayMatrix(BufferStrategy buffer, Point offset) {
         this.buffer = buffer;
         this.offset = offset;
-        
-        // Заливаем всё белым, для фона
+    }
+    
+    public void reset() {
+        // В«Р”РµР°РєС‚РёРІРёСЂСѓРµРјВ» РІСЃРµ РїРёРєСЃРµР»Рё Р·Р°Р»РёРІР°СЏ РІСЃС‘ Р±РµР»С‹Рј С„РѕРЅРѕРј
         Graphics g = this.buffer.getDrawGraphics();
         g.setColor(Color.WHITE);
         g.translate(offset.x, offset.y);
@@ -35,16 +37,17 @@ public class DisplayMatrix implements IDisplayMatrix {
     public void setPixel(int x, int y, PixelType type) {
         Color color;
         
-        // В зависимости от типа, выбираем цвет
+        // Р’ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РёРїР°, РІС‹Р±РёСЂР°РµРј С†РІРµС‚
         switch (type) {
             case BLOCK: color = Color.BLACK; break;
             case SNAKE_HEAD: color = Color.GRAY; break;
+            case SNAKE_BODY: color = Color.LIGHT_GRAY; break;
             default: color = Color.BLACK;
         }
         
         this.g.setColor(color);
         
-        // Вычисляем координаты пикселя
+        // Р’С‹С‡РёСЃР»СЏРµРј РєРѕРѕСЂРґРёРЅР°С‚С‹ РїРёРєСЃРµР»СЏ
         x = 5 + x * 22;
         y = 5 + y * 22;
         

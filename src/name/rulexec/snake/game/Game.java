@@ -9,7 +9,7 @@ public class Game {
     private float timer = 0;
     
     public Game() {
-        this.snake = new Snake(14, 11);
+        this.snake = new Snake(14, 11, Direction.RIGHT);
         this.direction = Direction.LEFT;
     }
     
@@ -18,7 +18,7 @@ public class Game {
     }
     
     public void init() {
-        // Показываем границы
+        // РџРѕРєР°Р·С‹РІР°РµРј РіСЂР°РЅРёС†С‹
         for (int j = 0; j < 2; j++) {
             for (int i = 0; i < 28; i++) {
                 this.displayMatrix.setPixel(i, j * 21, PixelType.BLOCK);
@@ -30,40 +30,58 @@ public class Game {
                 this.displayMatrix.setPixel(j * 27, i, PixelType.BLOCK);
             }
         }
+        
+        // РћС‚РѕР±СЂР°Р¶Р°РµРј С‡Р°СЃС‚Рё Р·РјРµР№РєРё
+        boolean isFirst = true;
+        for (Segment s : this.snake.getSegments()) {
+            if (isFirst) {
+                this.displayMatrix.setPixel(s.x, s.y, PixelType.SNAKE_HEAD);
+                isFirst = false;
+            } else {
+                this.displayMatrix.setPixel(s.x, s.y, PixelType.SNAKE_BODY);
+            }
+        }
     }
     
     public void changeDirection(Direction d) {
-        this.direction = d;
+        // РњРµРЅСЏРµРј РЅР°РїСЂР°РІР»РµРЅРёРµ, РµСЃР»Рё С‚СѓРґР° РјРѕР¶РЅРѕ РґРІРёРіР°С‚СЊСЃСЏ
+        if (this.snake.isPossibleMove(d))
+            this.direction = d;
     }
     
     public boolean step(float deltaT) {
-        // Прибавляем к прошедшему времени, сколько прошло
+        // РџСЂРёР±Р°РІР»СЏРµРј Рє РїСЂРѕС€РµРґС€РµРјСѓ РІСЂРµРјРµРЅРё, СЃРєРѕР»СЊРєРѕ РїСЂРѕС€Р»Рѕ
         this.timer += deltaT;
         
-        boolean alive = true;
-        
-        // Если прошло больше, чем 300мс
+        // Р•СЃР»Рё РїСЂРѕС€Р»Рѕ Р±РѕР»СЊС€Рµ, С‡РµРј 300РјСЃ
         while (this.timer > 0.3) {
             this.timer -= 0.3;
             
-            // То пересчитываем игровую ситуацию
-            alive = this.recalc();
+            // РўРѕ РїРµСЂРµСЃС‡РёС‚С‹РІР°РµРј РёРіСЂРѕРІСѓСЋ СЃРёС‚СѓР°С†РёСЋ
+            boolean alive = this.recalc();
+            if (!alive) return false;
         }
 
-        return alive;
+        return true;
     }
     
     private boolean recalc() {
-        // Стираем прошлое местоположение головы
-        this.displayMatrix.disablePixel(this.snake.x, this.snake.y);
-        // Передвигаем в нужную сторону
-        this.snake.move(this.direction);
-        // Отображаем пиксель на новом месте
-        this.displayMatrix.setPixel(this.snake.x, this.snake.y, PixelType.SNAKE_HEAD);
+        // РњРµРЅСЏРµРј РїРёРєСЃРµР»СЊ РіРѕР»РѕРІС‹ РЅР° РїРёРєСЃРµР»СЊ С‚РµР»Р°
+        Segment head = this.snake.getHead();
+        this.displayMatrix.setPixel(head.x, head.y, PixelType.SNAKE_BODY);
+        // РЎС‚РёСЂР°РµРј РїСЂРѕС€Р»РѕРµ РјРµСЃС‚РѕРїРѕР»РѕР¶РµРЅРёРµ С…РІРѕСЃС‚Р°
+        Segment tail = this.snake.getTail();
+        this.displayMatrix.disablePixel(tail.x, tail.y);
+        // РџРµСЂРµРґРІРёРіР°РµРј РІ РЅСѓР¶РЅСѓСЋ СЃС‚РѕСЂРѕРЅСѓ
+        boolean isIntersects = this.snake.move(this.direction);
+        // РћС‚РѕР±СЂР°Р¶Р°РµРј РїРёРєСЃРµР»СЊ РЅР° РЅРѕРІРѕРј РјРµСЃС‚Рµ РіРѕР»РѕРІС‹
+        head = this.snake.getHead();
+        this.displayMatrix.setPixel(head.x, head.y, PixelType.SNAKE_HEAD);
         
-        // Если врезались в границу, заканчиваем это безобразие
-        if (this.snake.x == 0 || this.snake.x == 27 ||
-            this.snake.y == 0 || this.snake.y == 21)
+        // Р•СЃР»Рё РІСЂРµР·Р°Р»РёСЃСЊ РІ РіСЂР°РЅРёС†Сѓ, Р»РёР±Рѕ Р¶Рµ РІ СЃР°РјСѓ СЃРµР±СЏ,
+        // Р·Р°РєР°РЅС‡РёРІР°РµРј СЌС‚Рѕ Р±РµР·РѕР±СЂР°Р·РёРµ.
+        if (head.x == 0 || head.x == 27 ||
+            head.y == 0 || head.y == 21 || isIntersects)
         {
             return false;
         } else {
