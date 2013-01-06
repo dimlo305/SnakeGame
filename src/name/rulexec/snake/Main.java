@@ -5,6 +5,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Random;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -15,6 +16,8 @@ import name.rulexec.snake.game.Game;
 public class Main implements Runnable {
     public static final int WIDTH = 624,
                             HEIGHT = 492;
+    
+    public static final Random rand = new Random();
     
     private JFrame frame;
     private JPanel panel;

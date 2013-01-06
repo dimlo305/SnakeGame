@@ -6,6 +6,8 @@ import java.util.Iterator;
 
 class Segment {
     public int x, y;
+    boolean feeded = false;
+    
     public Segment(int x, int y) {
         this.x = x;
         this.y = y;
@@ -18,6 +20,10 @@ class Segment {
             case UP: this.y -= 1; break;
             case DOWN: this.y += 1; break;
         }
+    }
+    
+    public Segment clone() {
+        return new Segment(x, y);
     }
 }
 
@@ -44,11 +50,21 @@ public class Snake {
         // Логика перемещения проста.
         // Берём последний сегмент змеи, меняем его координаты
         // и ставим в голову змеи в соответствии с направлением.
+        // Так же, если последний сегмент оказывается "покормленным",
+        // тогда нужно добавить в конец новый сегмент.
         
         Segment first = this.segments.getFirst();
         Segment last = this.segments.pollLast();
         
-        this.occupied[last.x][last.y] = false;
+        // Если покормлен, забываем об этом и добавляем в конец новый сегмент
+        if (last.feeded) {
+            last.feeded = false;
+            
+            this.segments.addLast(new Segment(last.x, last.y));
+        } else {
+            // Если не покормлен, то его больше там нет
+            this.occupied[last.x][last.y] = false;
+        }
         
         last.x = first.x;
         last.y = first.y;
@@ -63,15 +79,8 @@ public class Snake {
         return isOccupied;
     }
     
-    public Segment getHead() {
-        return this.segments.getFirst();
-    }
-    public Segment getTail() {
-        return this.segments.getLast();
-    }
-    
-    public Iterable<Segment> getSegments() {
-        return this.segments;
+    public void feed() {
+        this.segments.getFirst().feeded = true;
     }
     
     // Проверяет, возможно ли двигаться в ту сторону
@@ -88,5 +97,20 @@ public class Snake {
             case DOWN: return head.y >= next.y;
             default: throw new RuntimeException("Impossible direction");
         }
+    }
+    
+    public boolean isOccupied(int x, int y) {
+        return this.occupied[x][y];
+    }
+    
+    public Segment getHead() {
+        return this.segments.getFirst();
+    }
+    public Segment getTail() {
+        return this.segments.getLast();
+    }
+    
+    public Iterable<Segment> getSegments() {
+        return this.segments;
     }
 }
